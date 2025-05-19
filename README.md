@@ -1,12 +1,71 @@
-# DataAnalytics-Assessment
+# DataAnalytics Assessment
 
-## Overview
-
-This repository contains solutions to the SQL proficiency assessment that evaluates SQL querying, data transformation, and problem-solving skills using a transactional database.
+This repository contains optimized MySQL scripts that solve a set of real-world data analyst assessment questions. Each solution is designed to extract actionable insights from customer and transaction data using efficient SQL queries with clear documentation and best practices.
 
 ---
 
-## Repository Structure
+## Problem Overview
+
+The assessment focuses on customer segmentation, behavioral analytics, and business intelligence reporting based on savings and investment plans. Key business questions include:
+
+1. **Identifying high-value customers with diverse financial product engagement**
+2. **Categorizing customers by transaction frequency**
+3. **Flagging inactive accounts for potential re-engagement**
+4. **Estimating Customer Lifetime Value (CLV)**
+
+---
+
+## Solution Summary
+
+### **1. High-Value Customers with Multiple Products**
+
+Identifies users who have both **savings** and **investment** plans and ranks them by total confirmed deposits.
+
+* Filters only active (non-deleted) and funded plans
+* Ensures customers have at least one savings and one investment product
+* Uses aggregation and joins across multiple tables
+
+### **2. Transaction Frequency Analysis**
+
+Segments customers into **High**, **Medium**, or **Low** frequency users based on their average monthly transaction volume.
+
+* Handles new users with zero-month tenure
+* Uses `TIMESTAMPDIFF()` for tenure calculations
+* Prevents division by zero with `CASE` logic
+
+### **3. Account Inactivity Alert**
+
+Flags both savings and investment accounts with **no transactions in the past 365 days** or **no transactions at all**.
+
+* Uses `DATEDIFF()` and `MAX(created_on)` for activity checks
+* Filters out deleted and archived plans
+
+### **4. Customer Lifetime Value (CLV) Estimation**
+
+Estimates CLV using this formula:
+
+> CLV = (Transactions per month) × 12 × (Avg. Transaction Value × 0.1%)
+
+* Converts transaction values from kobo to Naira
+* Excludes customers with zero tenure
+* Uses rounding and null-safe calculations
+
+---
+
+## Technical Highlights
+
+* **Environment**: MySQL
+* **Schema**: `adashi_staging`
+* **Functions Used**: `TIMESTAMPDIFF()`, `DATEDIFF()`, `NOW()`, `CASE`, `NULLIF()`
+* **Error Handling**: Division-by-zero safeguards, `NULL` checks
+* **Readability**: Inline comments and consistent formatting for clarity
+* **Performance**: Optimized joins and use of `GROUP BY` to support scalability
+
+---
+
+## File Structure
+
+All queries are consolidated in one SQL file with section headers:
 
 ```
 DataAnalytics-Assessment/
@@ -19,123 +78,12 @@ DataAnalytics-Assessment/
 └── README.md # Project documentation
 ```
 
----
-
-## Solutions Overview
-
-### Question 1: High-Value Customers with Multiple Products
-
-**Objective:**  
-Identify customers who have both at least one funded savings plan and one funded investment plan.
-
-**Approach:**  
-
-- Joined customer data with plan and savings tables  
-- Filtered for funded savings and investment plans (`is_regular_savings = 1`, `is_a_fund = 1`)  
-- Counted product types and summed deposits  
-- Ordered by total deposits in descending order
-
-**Key Insights:**  
-
-- Identifies cross-selling opportunities by highlighting multi-product users  
-- Helps the business focus on high-value, multi-engaged customers  
+Each query is reusable, production-ready, and tested in a sandboxed staging environment.
 
 ---
 
-### Question 2: Transaction Frequency Analysis
+## Author Note
 
-**Objective:**  
-Categorize customers by average monthly transaction frequency into High, Medium, or Low frequency tiers.
+This assessment demonstrates practical skills in writing performant, readable SQL for customer analytics and retention-focused use cases. Every query is built with care to reflect real business needs and handle edge cases gracefully.
 
-**Approach:**  
-
-- Aggregated total transactions by customer  
-- Computed average transactions per month  
-- Applied frequency tier classification:
-  - High (≥10/month)
-  - Medium (3–9/month)
-  - Low (≤2/month)  
-- Counted number of customers in each group  
-
-**Key Insights:**  
-
-- Enables customer segmentation for targeted engagement  
-- Distinguishes active users from dormant or occasional transactors  
-
----
-
-### Question 3: Account Inactivity Alert
-
-**Objective:**  
-Detect active accounts (savings or investment) with no inflow transactions in the past 365 days.
-
-**Approach:**  
-
-- Identified most recent transaction per account  
-- Calculated days since last transaction using the current date  
-- Filtered for active accounts with inactivity over a year
-
-**Key Insights:**  
-
-- Supports reactivation campaigns and customer follow-ups  
-- Flags potentially abandoned accounts for review  
-
----
-
-### Question 4: Customer Lifetime Value Estimation
-
-**Objective:**  
-Estimate customer lifetime value (CLV) using a simplified model based on tenure and transaction behavior.
-
-**Approach:**  
-
-- Calculated account tenure in months since signup  
-- Counted total transactions per customer  
-- Estimated CLV using the formula:  
-  `CLV = (total_transactions / tenure_months) * 12 * avg_profit_per_transaction`  
-  with `avg_profit_per_transaction = 0.001 * average transaction value`  
-- Ordered customers by estimated CLV descending  
-
-**Key Insights:**  
-
-- Provides a data-driven way to prioritize customer retention  
-- Helps identify the most valuable long-term customers  
-
----
-
-## Challenges Faced
-
-1. **Schema Interpretation** – Interpreted relationships and logic from the table and column names with minimal documentation.
-2. **Currency Handling** – Ensured all amount fields stored in kobo were correctly converted to naira.
-3. **Edge Cases** – Managed null values, zero-tenure divisions, and sparse transaction records.
-4. **Performance Considerations** – Wrote queries with efficient joins and minimal nesting to scale well on large datasets.
-
----
-
-## Technical Considerations
-
-- SQL queries follow consistent formatting and indentation  
-- Inline comments explain non-obvious logic or transformations  
-- Null values, currency conversion, and zero-divisions are handled gracefully  
-- Queries assume compatibility with standard MySQL syntax  
-
----
-
-## Assumptions
-
-- `is_regular_savings = 1` flags a valid savings plan  
-- `is_a_fund = 1` flags an investment plan  
-- `confirmed_amount` refers to deposit inflows  
-- All amount fields are stored in kobo (divide by 100 for naira)  
-- `is_deleted = 0` marks active (non-deleted) accounts  
-
----
-
-## How to Use
-
-1. Clone this repository  
-2. Load the provided database and schema into MySQL  
-3. Run each `.sql` script individually  
-4. Verify outputs against expected results  
-
-For questions, feedback, or collaboration, feel free to reach out.
+If you'd like to collaborate, hire, or learn more about the thought process behind these queries, feel free to connect!
