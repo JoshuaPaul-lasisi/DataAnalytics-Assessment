@@ -7,6 +7,7 @@ This repository contains solutions to the SQL proficiency assessment that evalua
 ---
 
 ## Repository Structure
+
 ```
 DataAnalytics-Assessment/
 │
